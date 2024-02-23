@@ -19,7 +19,7 @@ router.get("/updatesignin", authMiddleware, userController.updateLoginUser);
 // router.route("/profile").get(protect, userController.getUserProfile);
 router.post("/getUser", userController.getUserProfile);
 router.post("/profile/get", userController.getProfileInfo);
-router.get("/getAllUsers", userController.getAllUsers);
+router.post("/getAllUsers", userController.getAllUsers);
 router.post("/deactivate", userController.deactivateAccount);
 
 //followers

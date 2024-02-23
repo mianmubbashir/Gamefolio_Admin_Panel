@@ -37,8 +37,6 @@ const ProtectedRoute = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  console.log("UData: ", userData);
-
   const payload = {
     userToken: getFromLocal("@token"),
   };
@@ -47,7 +45,6 @@ const ProtectedRoute = () => {
   };
 
   useEffect(() => {
-    console.log("run");
     if (!getFromLocal("@token")) {
       const timer = setTimeout(() => {
         navigate(ROUTES.login); // Redirect to sign-in page

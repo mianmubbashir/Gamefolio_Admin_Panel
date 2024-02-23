@@ -9,7 +9,7 @@ import {
   TextInput,
 } from "flowbite-react";
 import type { FC } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   HiChevronLeft,
   HiChevronRight,
@@ -24,6 +24,13 @@ import {
   HiTrash,
 } from "react-icons/hi";
 import NavbarSidebarLayout from "../../layouts/navbar-sidebar";
+import { RootState, dispatch, useSelector } from "../../store";
+import {
+  getAllUsers,
+  setDecreasePage,
+  setIncreasePage,
+} from "../../store/slices/userSlice";
+import { getFromLocal } from "../../utils/localStorage";
 
 const UserListPage: FC = function () {
   return (
@@ -204,6 +211,21 @@ const AddUserModal: FC = function () {
 };
 
 const AllUsersTable: FC = function () {
+  const { userList, page } = useSelector((state: RootState) => state.user);
+
+  const payload = {
+    userToken: getFromLocal("@token"),
+    limit: 2,
+    page: page,
+  };
+  const params = {
+    payload,
+  };
+
+  useEffect(() => {
+    dispatch(getAllUsers(params));
+  }, [page]);
+
   return (
     <Table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
       <Table.Head className="bg-gray-100 dark:bg-gray-700">
@@ -214,969 +236,69 @@ const AllUsersTable: FC = function () {
           <Checkbox id="select-all" name="select-all" />
         </Table.HeadCell>
         <Table.HeadCell>Name</Table.HeadCell>
-        <Table.HeadCell>Position</Table.HeadCell>
-        <Table.HeadCell>Country</Table.HeadCell>
+
+        <Table.HeadCell>Type</Table.HeadCell>
+        <Table.HeadCell>Signup Method</Table.HeadCell>
         <Table.HeadCell>Status</Table.HeadCell>
         <Table.HeadCell>Actions</Table.HeadCell>
       </Table.Head>
       <Table.Body className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <Checkbox aria-describedby="checkbox-1" id="checkbox-1" />
-              <label htmlFor="checkbox-1" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/neil-sims.png"
-              alt="Neil Sims avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Neil Sims
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                neil.sims@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Front-end developer
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            United States
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
-              Active
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-2"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-2" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/roberta-casas.png"
-              alt="Roberta Casas avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Roberta Casas
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                roberta.casas@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Designer
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Spain
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
-              Active
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-3"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-3" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/michael-gough.png"
-              alt="Michael Gough avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Michael Gough
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                michael.gough@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            React developer
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            United Kingdom
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
-              Active
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-4"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-4" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/jese-leos.png"
-              alt="Jese Leos avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Jese Leos
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                jese.leos@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Marketing
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            United States
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
-              Active
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-5"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-5" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/bonnie-green.png"
-              alt="Bonnie Green avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Bonnie Green
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                bonnie.green@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            UI/UX Engineer
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            AusTable.Rowalia
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-red-500"></div>{" "}
-              Offline
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-6"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-6" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/thomas-lean.png"
-              alt="Thomas Lean avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Thomas Lean
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                thomas.lean@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Vue developer
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Germany
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
-              Active
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-7"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-7" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/helene-engels.png"
-              alt="Helene Engels avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Helene Engels
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                helene.engels@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Product owner
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Canada
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
-              Active
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-8"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-8" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/lana-byrd.png"
-              alt="Lana Byrd avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Lana Byrd
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                lana.byrd@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Designer
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            United States
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
-              Active
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-9"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-9" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/leslie-livingston.png"
-              alt="Leslie Livingston avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Leslie Livingston
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                leslie.livingston@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Web developer
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            France
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-red-500"></div>{" "}
-              Offline
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-10"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-10" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/robert-brown.png"
-              alt="Robert Brown avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Robert Brown
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                robert.brown@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Laravel developer
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Russia
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
-              Active
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-11"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-11" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/neil-sims.png"
-              alt="Neil Sims avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Neil Sims
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                neil.sims@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Front-end developer
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            United States
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
-              Active
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-12"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-12" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/roberta-casas.png"
-              alt="Roberta Casas avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Roberta Casas
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                roberta.casas@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Designer
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Spain
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
-              Active
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-13"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-13" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/michael-gough.png"
-              alt="Michael Gough avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Michael Gough
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                michael.gough@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            React developer
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            United Kingdom
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
-              Active
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-14"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-14" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/jese-leos.png"
-              alt="Jese Leos avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Jese Leos
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                jese.leos@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Marketing
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            United States
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
-              Active
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-15"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-15" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/bonnie-green.png"
-              alt="Bonnie Green avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Bonnie Green
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                bonnie.green@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            UI/UX Engineer
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            AusTable.Rowalia
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-red-500"></div>{" "}
-              Offline
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
+        {userList?.map((user: any) => {
+          return (
+            <Table.Row
+              className="hover:bg-gray-100 dark:hover:bg-gray-700"
+              key={user?._id}
+            >
+              <Table.Cell className="w-4 p-4">
+                <div className="flex items-center">
+                  <Checkbox aria-describedby="checkbox-1" id="checkbox-1" />
+                  <label htmlFor="checkbox-1" className="sr-only">
+                    checkbox
+                  </label>
+                </div>
+              </Table.Cell>
+              <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
+                <img
+                  className="h-10 w-10 rounded-full"
+                  src={
+                    user?.profilePicture || "../../images/users/neil-sims.png"
+                  }
+                  alt="Neil Sims avatar"
+                />
+                <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                  <div className="text-base font-semibold text-gray-900 dark:text-white">
+                    {user?.name}
+                  </div>
+                  <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                    {user?.email}
+                  </div>
+                </div>
+              </Table.Cell>
+              <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
+                {user?.accountType}
+              </Table.Cell>
 
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-16"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-16" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/thomas-lean.png"
-              alt="Thomas Lean avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Thomas Lean
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                thomas.lean@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Vue developer
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Germany
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
-              Active
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
-
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-17"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-17" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/helene-engels.png"
-              alt="Helene Engels avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Helene Engels
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                helene.engels@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Product owner
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Canada
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
-              Active
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-18"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-18" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/lana-byrd.png"
-              alt="Lana Byrd avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Lana Byrd
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                lana.byrd@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Designer
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            United States
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
-              Active
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-19"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-19" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/leslie-livingston.png"
-              alt="Leslie Livingston avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Leslie Livingston
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                leslie.livingston@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Web developer
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            France
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-red-500"></div>{" "}
-              Offline
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
-        <Table.Row className="hover:bg-gray-100 dark:hover:bg-gray-700">
-          <Table.Cell className="w-4 p-4">
-            <div className="flex items-center">
-              <input
-                id="checkbox-20"
-                aria-describedby="checkbox-1"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 bg-gray-50 focus:ring-4 focus:ring-primary-300 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
-              />
-              <label htmlFor="checkbox-20" className="sr-only">
-                checkbox
-              </label>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="mr-12 flex items-center space-x-6 whitespace-nowrap p-4 lg:mr-0">
-            <img
-              className="h-10 w-10 rounded-full"
-              src="../../images/users/robert-brown.png"
-              alt="Robert Brown avatar"
-            />
-            <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              <div className="text-base font-semibold text-gray-900 dark:text-white">
-                Robert Brown
-              </div>
-              <div className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                robert.brown@betaone.io
-              </div>
-            </div>
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Laravel developer
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white">
-            Russia
-          </Table.Cell>
-          <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
-            <div className="flex items-center">
-              <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
-              Active
-            </div>
-          </Table.Cell>
-          <Table.Cell>
-            <div className="flex items-center gap-x-3 whitespace-nowrap">
-              <EditUserModal />
-              <DeleteUserModal />
-            </div>
-          </Table.Cell>
-        </Table.Row>
+              <Table.Cell className="whitespace-nowrap p-4 text-base font-medium text-gray-900 dark:text-white text-center">
+                {user?.signupMethod
+                  ? user.signupMethod.charAt(0).toUpperCase() +
+                    user.signupMethod.slice(1)
+                  : ""}
+              </Table.Cell>
+              <Table.Cell className="whitespace-nowrap p-4 text-base font-normal text-gray-900 dark:text-white">
+                <div className="flex items-center">
+                  <div className="mr-2 h-2.5 w-2.5 rounded-full bg-green-400"></div>{" "}
+                  Active
+                </div>
+              </Table.Cell>
+              <Table.Cell>
+                <div className="flex items-center gap-x-3 whitespace-nowrap">
+                  <EditUserModal />
+                  <DeleteUserModal />
+                </div>
+              </Table.Cell>
+            </Table.Row>
+          );
+        })}
       </Table.Body>
     </Table>
   );
@@ -1328,19 +450,27 @@ const DeleteUserModal: FC = function () {
 };
 
 export const Pagination: FC = function () {
+  const { page, totalPage } = useSelector((state: RootState) => state.user);
+  // handle increase page
+  const handleIncreasePage = () => {
+    dispatch(setIncreasePage());
+  };
+  const handleDecreasePage = () => {
+    dispatch(setDecreasePage());
+  };
   return (
     <div className="sticky bottom-0 right-0 w-full items-center border-t border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex sm:justify-between">
       <div className="mb-4 flex items-center sm:mb-0">
         <a
-          href="#"
           className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+          onClick={handleDecreasePage}
         >
           <span className="sr-only">Previous page</span>
           <HiChevronLeft className="text-2xl" />
         </a>
         <a
-          href="#"
           className="mr-2 inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+          onClick={handleIncreasePage}
         >
           <span className="sr-only">Next page</span>
           <HiChevronRight className="text-2xl" />
@@ -1348,25 +478,25 @@ export const Pagination: FC = function () {
         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
           Showing&nbsp;
           <span className="font-semibold text-gray-900 dark:text-white">
-            1-20
+            {page}-{2}
           </span>
           &nbsp;of&nbsp;
           <span className="font-semibold text-gray-900 dark:text-white">
-            2290
+            {totalPage}
           </span>
         </span>
       </div>
       <div className="flex items-center space-x-3">
         <a
-          href="#"
-          className="inline-flex flex-1 items-center justify-center rounded-lg bg-primary-700 px-3 py-2 text-center text-sm font-medium text-white hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+          className="inline-flex flex-1 items-center justify-center rounded-lg bg-primary-700 px-3 py-2 text-center text-sm font-medium text-white hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 cursor-pointer"
+          onClick={handleDecreasePage}
         >
           <HiChevronLeft className="mr-1 text-base" />
           Previous
         </a>
         <a
-          href="#"
-          className="inline-flex flex-1 items-center justify-center rounded-lg bg-primary-700 px-3 py-2 text-center text-sm font-medium text-white hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+          className="inline-flex flex-1 items-center justify-center rounded-lg bg-primary-700 px-3 py-2 text-center text-sm font-medium text-white hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800 cursor-pointer"
+          onClick={handleIncreasePage}
         >
           Next
           <HiChevronRight className="ml-1 text-base" />

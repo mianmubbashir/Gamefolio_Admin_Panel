@@ -10,6 +10,8 @@ export type InitialState = {
   profileUserInfo?: any;
   userList?: any;
   profile?: any;
+  page: number;
+  totalPage: number;
 };
 
 const initialState: InitialState = {
@@ -18,6 +20,8 @@ const initialState: InitialState = {
   profileUserInfo: {},
   userList: [],
   profile: null,
+  page: 1,
+  totalPage: 1,
 };
 
 export const slice = createSlice({
@@ -48,16 +52,31 @@ export const slice = createSlice({
     setSearchUserInfo(state, action) {
       state.profileUserInfo = action.payload;
     },
+    setTotalPage(state, action) {
+      state.totalPage = action.payload;
+    },
+    setIncreasePage(state) {
+      if (state.page < state.totalPage) {
+        state.page = state.page + 1;
+      } else {
+        state.page = state.totalPage;
+      }
+    },
+    setDecreasePage(state) {
+      if (state.page > 1) {
+        state.page = state.page - 1;
+      } else {
+        state.page = 1;
+      }
+    },
   },
 });
 
+export const { setIncreasePage, setDecreasePage } = slice.actions;
+
 export function getUser(params: ActionParams) {
   return async () => {
-    const {
-      successCallback = () => {},
-      errorCallback = () => {},
-      paramspayload,
-    }: any = params;
+    const { successCallback = () => {} }: any = params;
 
     const options: APIParams = {
       method: "GET",
@@ -78,21 +97,24 @@ export function getUser(params: ActionParams) {
   };
 }
 
-export function getAllUsers() {
+export function getAllUsers(params: ActionParams) {
   return async () => {
+    const { payload } = params;
     dispatch(slice.actions.startLoading());
     const options: APIParams = {
-      method: "GET",
+      method: "POST",
       endpoint: PATH.user.getAllUsers,
-      payload: {},
+      payload: payload,
       isToken: false,
     };
 
     try {
       const [ok, response] = await API(options);
       dispatch(slice.actions.getAllUsers(response.data));
+      dispatch(slice.actions.setTotalPage(response.totalPages));
     } catch (error) {
       console.log(error);
+      dispatch(slice.actions.stopLoading());
     } finally {
       dispatch(slice.actions.stopLoading());
     }

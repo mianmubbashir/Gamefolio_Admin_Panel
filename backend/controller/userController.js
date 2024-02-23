@@ -411,10 +411,30 @@ const getProfileInfo = asyncHandler(async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find();
-    res
-      .status(201)
-      .json({ data: users, message: "Successfully Retrieve Users" });
+    const { userToken, limit, page } = req.body;
+    // Calculate skip value based on pagination
+    const skip = limit * (page - 1);
+
+    const totalUsers = await User.countDocuments(); // Get total number of users
+    const totalPages = Math.ceil(totalUsers / limit); // Calculate total pages
+
+    // Check if requested page exceeds total pages
+    if (page > totalPages) {
+      return res.status(400).json({ error: "Invalid page number." });
+    }
+
+    const users = await User.find().sort({ date: -1 }).skip(skip).limit(limit);
+
+    // Check if current page is the last page
+    const isLastPage = page >= totalPages;
+
+    res.status(201).json({
+      data: users,
+      totalUsers: totalUsers,
+      totalPages: totalPages,
+      isLastPage: isLastPage,
+      message: "Successfully Retrieve Users",
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({
