@@ -42,7 +42,7 @@ export const API = async (params: APIParams) => {
 
   if (isToken) {
     const token = getFromLocal("@token");
-    headers = { ...headers, Authorization: `Bearer ${token}` };
+    headers = { ...headers, Authorization: `${token}` };
   }
 
   let options: APIOption = {
@@ -76,8 +76,9 @@ export const API = async (params: APIParams) => {
     if (toJSON === false) {
       return [ok, {}];
     }
-
+    // Unauthorised 401 so redirect to login
     if (response?.status === 401) {
+      window.location.href = "http://localhost:5173/authentication/sign-in";
       return [false, {}];
     }
 

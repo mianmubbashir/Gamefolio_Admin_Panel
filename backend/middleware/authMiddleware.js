@@ -1,24 +1,30 @@
 const jwt = require("jsonwebtoken");
 
 const authMiddleware = async (req, res, next) => {
-  console.log("req.header: ", req.headers.authorization);
   // Get the token from the request headers or any other location where it's stored
   const token = req.headers.authorization;
+  console.log("token: ", token);
 
   // Verify the token
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (decoded && decoded.exp && decoded.exp * 1000 > Date.now()) {
-      req.token = token;
-      req.decodeduid = decoded.id;
+    console.log("decoded: ", decoded);
+    if (decoded?.id) {
       next();
     }
   } catch (error) {
-    return res.status(401).json({ message: "Invalid token" });
+    return res
+      .status(401)
+      .json({ message: "Invalid token", redirectTo: "/login" });
   }
 
   if (!token) {
-    return res.status(401).send("Not authorized, no token found");
+    return res
+      .status(401)
+      .json({
+        message: "Not authorized, no token found",
+        redirectTo: "/login",
+      });
   }
 };
 

@@ -684,7 +684,7 @@ const UserSignupsChart: FC = function () {
   const series = [
     {
       name: "Users",
-      data: [34, 45, 53, 38, 55, 32, 36],
+      data: [34, 50, 53, 38, 55, 32, 36],
     },
   ];
 

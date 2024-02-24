@@ -81,7 +81,7 @@ export function getUser(params: ActionParams) {
     const options: APIParams = {
       method: "GET",
       endpoint: PATH.user.getUser,
-      isToken: false,
+      isToken: true,
       payload: {},
     };
 
@@ -105,7 +105,7 @@ export function getAllUsers(params: ActionParams) {
       method: "POST",
       endpoint: PATH.user.getAllUsers,
       payload: payload,
-      isToken: false,
+      isToken: true,
     };
 
     try {

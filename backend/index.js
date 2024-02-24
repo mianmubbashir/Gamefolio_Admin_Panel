@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 dotenv.config();
 const userRoutes = require("./routes/userRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 const postRoutes = require("./routes/postRoutes");
 const clipsRoutes = require("./routes/clipsRoutes");
 const storyRoutes = require("./routes/storyRoutes");
@@ -92,6 +93,9 @@ app.get("/api/store-token", (req, res) => {
 app.get("/main", (req, res) => {
   res.send("Successfully authenticated");
 });
+
+// User API
+app.use("/api/admin", adminRoutes);
 
 // User API
 app.use("/api/user", userRoutes);

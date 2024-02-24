@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const User = require("../models/Users.js");
+const AdminUser = require("../models/AdminUser.js");
 const jwt = require("jsonwebtoken");
 const generateToken = require("../utils/generateToken.js");
 const generateOTP = require("../utils/generateOtp.js");
@@ -9,7 +9,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const { name, username, email, password } = req.body;
 
   // check if email exists in db
-  const userExists = await User.findOne({ email });
+  const userExists = await AdminUser.findOne({ email });
 
   if (userExists) {
     return res.status(404).json({ message: "User already exist" });
@@ -17,7 +17,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // create new user document in db
-  const user = await User.create({
+  const user = await AdminUser.create({
     name,
     username,
     email,
@@ -49,7 +49,7 @@ const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   // check if user email exists in db
-  const user = await User.findOne({ email });
+  const user = await AdminUser.findOne({ email });
 
   // return user obj if their password matches
   if (user && (await user.matchPassword(password))) {
@@ -106,7 +106,7 @@ const sendEmailOTP = asyncHandler(async (req, res) => {
   console.log("EMAIL : ", email);
 
   // check if user email exists in db
-  const user = await User.findOne({ Email: email });
+  const user = await AdminUser.findOne({ Email: email });
   console.log("user: ", user);
 
   // return user obj if their password matches
@@ -140,7 +140,7 @@ const verifyEmailOTP = asyncHandler(async (req, res) => {
   };
 
   // check if user email exists in db
-  const user = await User.findOne({ Email: email });
+  const user = await AdminUser.findOne({ Email: email });
 
   // return user obj if their password matches
   if (user) {
@@ -165,7 +165,7 @@ const sendForgotPasswordOTP = asyncHandler(async (req, res) => {
     console.log("Received request for forget password with email:", email);
 
     // Check if user with the provided email exists in the database
-    const user = await User.findOne({ email: email });
+    const user = await AdminUser.findOne({ email: email });
 
     // Check if user exists and has signupMethod as 'email'
     if (user && user.signupMethod === "email") {
@@ -205,7 +205,7 @@ const verifyForgetPasswordOTP = asyncHandler(async (req, res) => {
     );
 
     // Check if user with the provided email exists in the database
-    const user = await User.findOne({ email: email });
+    const user = await AdminUser.findOne({ email: email });
 
     // Check if user exists and has signupMethod as 'email'
     if (user && user.signupMethod === "email") {
@@ -247,7 +247,7 @@ const resetPassword = asyncHandler(async (req, res) => {
     );
 
     // Check if user with the provided email exists in the database
-    const user = await User.findOne({ email: email });
+    const user = await AdminUser.findOne({ email: email });
 
     // Check if user exists and has signupMethod as 'email'
     if (user && user.signupMethod === "email") {
@@ -290,7 +290,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 const updateLoginUser = asyncHandler(async (req, res) => {
   console.log("req.decodeduid::<<>> ", req.decodeduid);
 
-  const user = await User.findById(req.decodeduid);
+  const user = await AdminUser.findById(req.decodeduid);
 
   // return user obj if their password matches
   if (user) {
@@ -328,7 +328,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
   console.log("req.body.userToken: ", req.body.userToken);
   const decoded = jwt.verify(req.body.userToken, process.env.JWT_SECRET);
 
-  const user = await User.findById(decoded.id)
+  const user = await AdminUser.findById(decoded.id)
     .populate({
       path: "followers.userID",
       select: "name username profilePicture", // Specify the fields you want to retrieve
@@ -370,7 +370,7 @@ const getProfileInfo = asyncHandler(async (req, res) => {
   const { username } = req.body;
   console.log("username: ", username);
 
-  const user = await User.findOne({ username })
+  const user = await AdminUser.findOne({ username })
     .populate({
       path: "followers.userID",
       select: "name username profilePicture", // Specify the fields you want to retrieve
@@ -413,7 +413,7 @@ const getAllUsers = async (req, res) => {
     // Calculate skip value based on pagination
     const skip = limit * (page - 1);
 
-    const totalUsers = await User.countDocuments(); // Get total number of users
+    const totalUsers = await AdminUser.countDocuments(); // Get total number of users
     const totalPages = Math.ceil(totalUsers / limit); // Calculate total pages
 
     // Check if requested page exceeds total pages
@@ -421,7 +421,10 @@ const getAllUsers = async (req, res) => {
       return res.status(400).json({ error: "Invalid page number." });
     }
 
-    const users = await User.find().sort({ date: -1 }).skip(skip).limit(limit);
+    const users = await AdminUser.find()
+      .sort({ date: -1 })
+      .skip(skip)
+      .limit(limit);
 
     // Check if current page is the last page
     const isLastPage = page >= totalPages;
@@ -445,7 +448,7 @@ const getAllUsers = async (req, res) => {
 const updatePassword = asyncHandler(async (req, res) => {
   const { userID, password, newPassword } = req.body; // Assuming password and newPassword are sent in the request body
   try {
-    const user = await User.findById(userID);
+    const user = await AdminUser.findById(userID);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -473,49 +476,11 @@ const updatePassword = asyncHandler(async (req, res) => {
   }
 });
 
-const addPreferences = asyncHandler(async (req, res) => {
-  const { userID, preference } = req.body;
-
-  console.log("req.body: ", req.body);
-
-  try {
-    const user = await User.findById(userID);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    user.preferences = preference;
-    await user.save();
-
-    res.status(200).json({ message: "Preferences updated successfully" });
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-const addFavoriteGames = asyncHandler(async (req, res) => {
-  const { userID, favoriteGame } = req.body;
-
-  try {
-    const user = await User.findById(userID);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    user.favoriteGames = favoriteGame;
-    await user.save();
-
-    res.status(200).json({ message: "Favorite games updated successfully" });
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
 const report = asyncHandler(async (req, res) => {
   const { userID, report, description } = req.body;
 
   try {
-    const user = await User.findById(userID);
+    const user = await AdminUser.findById(userID);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -548,7 +513,7 @@ const updateProfile = async (req, res) => {
   try {
     // Find the user by ID
     console.log("updateProfile: ", req.body);
-    let user = await User.findById(userID);
+    let user = await AdminUser.findById(userID);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -574,247 +539,12 @@ const updateProfile = async (req, res) => {
   }
 };
 
-// Followers
-const addFollowers = asyncHandler(async (req, res) => {
-  const { userId, followerID } = req.body;
-
-  try {
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Check if the follower is already in the followers list
-    const isFollower = user.followers.find(
-      (follower) => follower.userID.toString() === followerID
-    );
-
-    if (isFollower) {
-      return res.status(400).json({ message: "Already a follower" });
-    }
-
-    // Add the follower to the user's followers list
-    user.followers.push({ userID: followerID });
-    await user.save();
-
-    const fUser = await User.findById(followerID);
-    // Add the following to the user's following list
-    fUser.following.push({ userID: userId });
-    await fUser.save();
-
-    // Use populate to retrieve additional information about the follower
-    const followedUser = await User.find()
-      .sort({ date: -1 })
-      .populate("followers.userID");
-
-    console.log("Updated user:", followedUser);
-
-    const followingUser = await User.find()
-      .sort({ date: -1 })
-      .populate("following.userID");
-
-    console.log("followingUser:", followingUser);
-
-    return res.status(201).json({
-      message: "Follower added successfully",
-      isFollowing: true,
-    });
-  } catch (error) {
-    return res.status(500).json({ message: "Server Error" });
-  }
-});
-
-const removeFollower = asyncHandler(async (req, res) => {
-  const { userId, followerID } = req.body;
-  console.log("req.body##: ", req.body);
-  try {
-    // Find the user who is being followed
-    const user = await User.findById(userId);
-    if (!user) {
-      return res
-        .status(404)
-        .json({ message: "User not found", error: "User not found" });
-    }
-
-    // Check if the follower is in the followers list
-    const followerIndex = user.followers.findIndex(
-      (follower) => follower.userID.toString() === followerID
-    );
-
-    if (followerIndex === -1) {
-      return res
-        .status(400)
-        .json({ message: "Follower not found", error: "Follower not found" });
-    }
-
-    // Remove the follower from the user's followers list
-    user.followers.splice(followerIndex, 1);
-    await user.save();
-
-    // Find the follower user to remove the following entry
-    const followerUser = await User.findById(followerID);
-    const followingIndex = followerUser.following.findIndex(
-      (following) => following.userID.toString() === userId
-    );
-
-    if (followingIndex !== -1) {
-      followerUser.following.splice(followerIndex, 1);
-      await followerUser.save();
-    }
-
-    // Use populate to retrieve additional information about the updated user
-    const updatedUser = await User.findById(userId)
-      .populate("followers.userID")
-      .populate("following.userID");
-
-    return res.status(200).json({
-      message: "Follower removed successfully",
-      updatedUser,
-    });
-  } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .json({ message: "Server Error", error: "Server Error" });
-  }
-});
-
-// Remove Following
-
-const removeFollowing = asyncHandler(async (req, res) => {
-  const { userId, followingID } = req.body;
-
-  try {
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Check if the user is following
-    const followingIndex = user.following.findIndex(
-      (following) => following.userID.toString() === followingID
-    );
-
-    if (followingIndex === -1) {
-      return res.status(400).json({ message: "Not following user" });
-    }
-
-    // Remove the following user from the user's following list
-    user.following.splice(followingIndex, 1);
-    await user.save();
-
-    // Find the following user to remove the follower entry
-    const followingUser = await User.findById(followingID);
-    const followerIndex = followingUser.followers.findIndex(
-      (follower) => follower.userID.toString() === userId
-    );
-
-    if (followerIndex !== -1) {
-      followingUser.followers.splice(followerIndex, 1);
-      await followingUser.save();
-    }
-
-    // Use populate to retrieve additional information about the updated user
-    const updatedUser = await User.findById(userId)
-      .populate("followers.userID")
-      .populate("following.userID");
-
-    return res.status(200).json({
-      message: "Following removed successfully",
-      updatedUser,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Server Error" });
-  }
-});
-
-// Block a user
-const blockUser = asyncHandler(async (req, res) => {
-  const { userId, blockedUserId } = req.body;
-  console.log("req.body____: ", req.body);
-
-  try {
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Check if the user is already blocked
-    const isBlocked = user.block.find(
-      (blockedUser) => blockedUser.userID.toString() === blockedUserId
-    );
-
-    if (isBlocked) {
-      return res.status(400).json({ message: "User is already blocked" });
-    }
-
-    // Block the user
-    user.block.push({ userID: blockedUserId });
-    await user.save();
-
-    // Populate data for the blocked user
-    const blockedUser = await User.find()
-      .sort({ date: -1 })
-      .populate("block.userID");
-
-    console.log("blockedUser:", blockedUser);
-
-    return res.status(201).json({
-      message: "User blocked successfully",
-      blockedUser: blockedUser,
-    });
-  } catch (error) {
-    return res.status(500).json({ message: "Server Error" });
-  }
-});
-
-// Unblock a user
-const unblockUser = asyncHandler(async (req, res) => {
-  const { userId, unblockedUserId } = req.body;
-  console.log("req.body____: ", req.body);
-
-  try {
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Check if the user is blocked
-    const blockedUserIndex = user.block.findIndex(
-      (blockedUser) => blockedUser.userID.toString() === unblockedUserId
-    );
-
-    if (blockedUserIndex === -1) {
-      return res.status(400).json({ message: "User is not blocked" });
-    }
-
-    // Remove the block entry for the unblocked user
-    user.block.splice(blockedUserIndex, 1);
-    await user.save();
-
-    // Populate data for the blocked user
-    const unblockedUser = await User.find()
-      .sort({ date: -1 })
-      .populate("block.userID");
-
-    return res.status(200).json({
-      message: "User unblocked successfully",
-      unblockedUser: unblockedUser,
-    });
-  } catch (error) {
-    return res.status(500).json({ message: "Server Error" });
-  }
-});
-
 // Deactivate user account
 const deactivateAccount = asyncHandler(async (req, res) => {
   const { userID } = req.body;
 
   try {
-    const user = await User.findById(userID);
+    const user = await AdminUser.findById(userID);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -857,14 +587,9 @@ module.exports = {
   sendForgotPasswordOTP,
   verifyForgetPasswordOTP,
   resetPassword,
-  addPreferences,
-  addFavoriteGames,
+
   report,
   updateProfile,
-  addFollowers,
-  removeFollower,
-  removeFollowing,
-  blockUser,
-  unblockUser,
+
   deactivateAccount,
 };
